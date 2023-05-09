@@ -1,13 +1,14 @@
 require("./utils.js");
-require('dotenv').config();
+require('dotenv').config(); //needed for secret encryption
 
 const express = require('express');
 const app = express();
 
-const session = require('express-session');
-const MongoStore = require('connect-mongo');
-const bcrypt = require('bcrypt');
-const Joi = require("joi");
+const session = require('express-session'); //session
+const MongoStore = require('connect-mongo'); //database
+
+const bcrypt = require('bcrypt'); //encrypting password
+const Joi = require("joi"); //checking matching password
 const saltRounds = 10;
 
 const expireTime = 1 * 60 * 60 * 1000; //expires after 1 day  (hours * minutes * seconds * millis)
@@ -28,7 +29,7 @@ const userCollection = database.db(mongodb_database).collection('users');
 
 app.use(express.urlencoded({extended: false}));
 
-console.log(`mongodb+srv://${mongodb_user}:${mongodb_password}@${mongodb_host}/sessions`);
+//console.log(`mongodb+srv://${mongodb_user}:${mongodb_password}@${mongodb_host}/sessions`);
 
 var mongoStore = MongoStore.create({
 	mongoUrl: `mongodb+srv://${mongodb_user}:${mongodb_password}@${mongodb_host}/sessions`,
@@ -48,15 +49,15 @@ app.use(session({
 app.get('/', (req,res) => {
     if (!req.session.authenticated) {
         var html = `
-        <button href="/signup"> Sign up </button> <br>
-        <button href="/login"> Log in </button>
+        <button onclick="window.location.href='/signup'"> Sign up </button> <br>
+        <button onclick="window.location.href='/login'"> Log in </button>
         `;
         res.send(html);
     } else {
         var html = `
         Hello Name! <br>
-        <button href="/members"> Go to Members Area </button> <br>
-        <button href="/logout"> Logout </button>
+        <button onclick="window.location.href='/members'"> Go to Members Area </button> <br>
+        <button onclick="window.location.href='/logout'"> Logout </button>
         `;
         res.send(html);
     }
@@ -64,13 +65,38 @@ app.get('/', (req,res) => {
 
 app.get('/signup', (req,res) => {
     var html = `
-    create user!
+    Signing up!
     <form action='/signUpUser' method='post'>
         <input name='username' type='text' placeholder='username'> <br>
         <input name='email' type='email' placeholder='email'> <br>
         <input name='password' type='password' placeholder='password'> <br>
     <button> Submit </button>
     </form>
+    `;
+    /*if (missingEmail) {
+        html = `
+        Name is required
+        <button onclick="window.location.href='/signUpUser'"> Retry </button>
+        `;
+    }*/
+    res.send(html);
+});
+
+app.get('/login', (req,res) => {
+    var html = `
+    Logging in!
+    <form action='/loginUser' method='post'>
+        <input name='username' type='text' placeholder='username'> <br>
+        <input name='password' type='password' placeholder='password'> <br>
+    <button> Submit </button>
+    </form>
+    `;
+    res.send(html);
+});
+
+app.get('/members', (req,res) => {
+    var html = `
+    Welcome!
     `;
     res.send(html);
 });
@@ -83,16 +109,16 @@ app.post('/signUpUser', async (req,res) => {
 	const schema = Joi.object(
 		{
 			username: Joi.string().alphanum().max(20).required(),
-            email: Joi.string().alphanum().required(),
+            email: Joi.string().required(),
 			password: Joi.string().max(20).required()
-		});
+		}
+    );
 	
 	const validationResult = schema.validate({username, email, password});
 	if (validationResult.error != null) {
-	   console.log(validationResult.error);
-	   //res.send(html);
+	   console.log(validationResult.message);
 	   return;
-   }
+    }
 
     var hashedPassword = await bcrypt.hash(password, saltRounds);
 	
