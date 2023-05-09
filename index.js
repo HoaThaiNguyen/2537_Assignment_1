@@ -107,7 +107,6 @@ app.post('/logInUser', async (req, res) => {
 		req.session.authenticated = true;
 		req.session.username = username;
 		req.session.cookie.maxAge = expireTime;
-        await userCollection.updateOne({username: 'Hoa'}, {$set: {user_type: 'admin'}});
 		res.redirect('/');
 		return;
 	} else {
