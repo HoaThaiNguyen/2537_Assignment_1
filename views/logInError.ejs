@@ -1,7 +1,7 @@
 <%- include("templates/header") %> 
 
-	<p> Oops! Username is not allowed to be empty. Try again! </p>
+	<p> Oops! <%= error %>. Try again! </p>
 	<br>
-	<button onclick="window.location.href='/login'"> Retry </button>
+	<button type="button" class="btn btn-primary me-2" onclick="window.location.href='/logIn'"> Retry </button>
 
 <%- include("templates/footer") %> 

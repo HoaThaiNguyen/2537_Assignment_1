@@ -1,17 +1,15 @@
 require("./utils.js");
-require('dotenv').config(); //needed for secret encryption
-
+require('dotenv').config();
 const express = require('express');
 const app = express();
 
-const session = require('express-session'); //session
-const MongoStore = require('connect-mongo'); //database
+const session = require('express-session'); 
+const MongoStore = require('connect-mongo');
+const bcrypt = require('bcrypt');
+const Joi = require("joi"); 
 
-const bcrypt = require('bcrypt'); //encrypting password
-const Joi = require("joi"); //checking matching password
-const saltRounds = 10;
-
-const expireTime = 1 * 60 * 60 * 1000; //expires after 1 hour (hours * minutes * seconds * millis)
+const saltRounds = 10; 
+const expireTime = 1 * 60 * 60 * 1000; //1 hour (hours*minutes*seconds*milliseconds)
 const port = process.env.PORT || 1520;
 
 /* secret stuff */
@@ -32,28 +30,28 @@ app.use(express.urlencoded({extended: false}));
 
 var mongoStore = MongoStore.create({
 	mongoUrl: `mongodb+srv://${mongodb_user}:${mongodb_password}@${mongodb_host}/sessions`,
-	crypto: {
+	crypto: { 
 		secret: mongodb_session_secret
 	}
 });
 
 app.use(session({ 
-    secret: node_session_secret,
+    secret: node_session_secret, 
 	store: mongoStore,
-	saveUninitialized: false, 
+	saveUninitialized: false,
 	resave: true
-}
-));
+}));
 
 app.get('/', (req,res) => {
     if (!req.session.authenticated) {
         res.render("index");
     } else {
+        console.log(req.session.user_type);
         res.render("logInUserIsIn", {username: req.session.username});
     }
 });
 
-app.get('/signup', (req,res) => {
+app.get('/signUp', (req,res) => {
     res.render("signUp");
 });
 
@@ -66,8 +64,7 @@ app.post('/signUpUser', async (req,res) => {
 			username: Joi.string().alphanum().max(20).required(),
             email: Joi.string().required(),
 			password: Joi.string().max(20).required()
-	    }
-    );
+	});
 
 	const validationResult = schema.validate({username, email, password});
 	if (validationResult.error != null) {
@@ -82,7 +79,7 @@ app.post('/signUpUser', async (req,res) => {
     }
 });
 
-app.get('/login', (req,res) => {
+app.get('/logIn', (req,res) => {
     res.render("logIn");
 });
 
@@ -93,13 +90,13 @@ app.post('/logInUser', async (req, res) => {
     const schema = Joi.string().max(20).required();
     const validationResult = schema.validate(username);
     if (validationResult.error != null) {
-        res.render("logInError");
+        res.render("logInError", {error: "Invalid or empty username"});   
         return;
     }
 
     const result = await userCollection.find({username: username}).project({username: 1, password: 1, _id: 1}).toArray();
 	if (result.length != 1) {
-        res.render("userNotFound");
+        res.render("logInError", {error: "Nonexisting account for this username"});
         return;
 	}
 	else if (await bcrypt.compare(password, result[0].password)) {
@@ -110,7 +107,7 @@ app.post('/logInUser', async (req, res) => {
 		res.redirect('/');
 		return;
 	} else {
-        res.render("logInIncorrectPassword");
+        res.render("logInError", {error: "Wrong password"});
 	}
 });
 
@@ -143,12 +140,13 @@ function sessionValidation(req,res,next) {
         next();
     }
     else {
-        res.redirect('/login');
+        res.redirect('/logIn');
     }
-}
+};
 
 function adminAuthorization(req, res, next) {
-    if (!isAdmin(req)) {
+    console.log(req.session.user_type);
+    if (req.session.user_type != 'admin') {
         res.status(403);
         res.render("adminUnauthorize");
         return;
@@ -156,17 +154,9 @@ function adminAuthorization(req, res, next) {
     else {
         next();
     }
-}
+};
 
-function isAdmin(req) {
-    console.log(req.session.user_type);
-    if (req.session.user_type == 'admin') {
-        return true;
-    }
-    return false;
-}
-
-app.get('/logout', (req,res) => {
+app.get('/logOut', (req,res) => {
 	req.session.destroy();
     res.render('logOut');
 });
@@ -176,7 +166,7 @@ app.use(express.static(__dirname + "/public"));
 app.get("*", (req,res) => {
 	res.status(404);
 	res.render("404");
-})
+});
 
 app.listen(port, () => {
 	console.log("Node application listening on port "+port);

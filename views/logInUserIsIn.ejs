@@ -1,9 +1,10 @@
 <%- include("templates/header") %> 
 
     <h3> Hey there, <%= username %>! </h3>
-    <p> You're logged in. Head to the member area to see more! </p>
+    <p> You're logged in. This is the Home Page. </p>
+    <p> Head to the member area to see more! </p>
     <br>
-    <button onclick="window.location.href='/members'"> Go to Members Area </button> <br>
-    <button onclick="window.location.href='/logout'"> Logout </button>
+    <button type="button" class="btn btn-primary" onclick="window.location.href='/members'"> Go to Members Area </button> <br>
+    <button type="button" class="btn btn-primary" onclick="window.location.href='/logOut'"> Logout </button>
 
 <%- include("templates/footer") %> 

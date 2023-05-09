@@ -1,4 +1,5 @@
 <%- include("templates/header") %> 
+
 	<div>Users:</div>
     <ul>
         <% let i=0; %>
@@ -6,4 +7,5 @@
         <%- include('templates/user', {user: users[i]})  %> 
         <% } %> 
     </ul>
+    
 <%- include("templates/footer") %> 

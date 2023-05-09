@@ -1,3 +1,5 @@
 # 2537_Assignment_1
-This is HoaNguyenThai's Comp2537 Assignment 1.
 Finished.
+
+# 2537_Assignment_2
+Finished everything else, but 'Admin' is not working.
