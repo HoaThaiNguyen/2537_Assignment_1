@@ -1,0 +1,19 @@
+<%- include("templates/header") %> 
+    
+    <h3> Welcome to the member page, <%= username %>! </h3>
+    <br>
+    <div class="row mb-3 text-center">
+        <div class="col-xxl-4 themed-grid-col">
+            <img src="/Jacq.jpg" style="width:500px" alt="Jacq">
+        </div>
+        <div class="col-xxl-4 themed-grid-col">
+            <img src="Miriam.jpg" style="width:500px" alt="Miriam">
+        </div>
+        <div class="col-xxl-4 themed-grid-col">
+            <img src="Nemona.jpg" style="width:500px" alt="Nemona">
+        </div>
+      </div>
+    <br>
+    <button class="btn btn-primary me-2" onclick="window.location.href='/logout'"> Logout </button>
+
+<%- include("templates/footer") %> 
