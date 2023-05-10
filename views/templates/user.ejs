@@ -1,1 +1,4 @@
-<li> <%= user.username %> </li>
+<li> <%= user.username %> (<%= user.user_type %>) 
+    <button class="btn btn-success me-2 mb-2" onclick="window.location.href='/promoteUser?name=<%= user.username %>'"> Promote to Admin </button>
+    <button class="btn btn-danger me-2 mb-2" onclick="window.location.href='/demoteUser?name=<%= user.username %>'"> Demote to User </button>
+</li>

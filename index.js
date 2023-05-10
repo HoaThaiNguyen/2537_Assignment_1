@@ -46,7 +46,6 @@ app.get('/', (req,res) => {
     if (!req.session.authenticated) {
         res.render("index");
     } else {
-        console.log(req.session.user_type);
         res.render("logInUserIsIn", {username: req.session.username});
     }
 });
@@ -130,7 +129,7 @@ app.get('/about', (req,res) => {
 });
 
 app.get('/admin', sessionValidation, adminAuthorization, async (req,res) => {
-    const result = await userCollection.find().project({username: 1, _id: 1}).toArray();
+    const result = await userCollection.find().project({username: 1, _id: 1, user_type: 1}).toArray();
  
     res.render("admin", {users: result});
 });
@@ -144,9 +143,10 @@ function sessionValidation(req,res,next) {
     }
 };
 
-function adminAuthorization(req, res, next) {
-    console.log(req.session.user_type);
-    if (req.session.user_type != 'admin') {
+async function adminAuthorization(req, res, next) {
+    const user = await userCollection.findOne({username: req.session.username});
+
+    if (user.user_type != 'admin') {
         res.status(403);
         res.render("adminUnauthorize");
         return;
@@ -155,6 +155,18 @@ function adminAuthorization(req, res, next) {
         next();
     }
 };
+
+app.get('/promoteUser', sessionValidation, adminAuthorization, async (req, res) => {
+    var username = req.query.name;
+    await userCollection.updateOne({username: username}, {$set: {user_type: 'admin'}});
+    res.redirect("/admin");
+})
+
+app.get('/demoteUser', sessionValidation, adminAuthorization, async (req, res) => {
+    var username = req.query.name;
+    await userCollection.updateOne({username: username}, {$set: {user_type: 'user'}});
+    res.redirect("/admin");
+})
 
 app.get('/logOut', (req,res) => {
 	req.session.destroy();

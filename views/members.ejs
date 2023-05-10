@@ -3,25 +3,17 @@
     <h3> Welcome to the member page, <%= username %>! </h3>
     <br>
     <div class="row mb-3 text-center">
-        <!--
-        <div class="col-xxl-4 themed-grid-col">
-            <img src="/Jacq.jpg" style="width:500px" alt="Jacq">
+        <div class="col-xxl-4 themed-grid-col mb-2">
+            <img src="/Jacq.jpg" style="width:100%; height:auto" alt="Jacq">
         </div>
-        <div class="col-xxl-4 themed-grid-col">
-            <img src="Miriam.jpg" style="width:500px" alt="Miriam">
+        <div class="col-xxl-4 themed-grid-col mb-2">
+            <img src="Miriam.jpg" style="width:100%; height:auto" alt="Miriam">
         </div>
-        <div class="col-xxl-4 themed-grid-col">
-            <img src="Nemona.jpg" style="width:500px" alt="Nemona">
+        <div class="col-xxl-4 themed-grid-col mb-2">
+            <img src="Nemona.jpg" style="width:100%; height:auto" alt="Nemona">
         </div>
-        -->
-        
-        <% let i=0; %>
-		<% for(i=0; i < imageList.length; i++) { %>
-        <%- include('templates/image', {image: imageList[i]})  %> 
-        <% } %> 
-
     </div>
     <br>
-    <button type="button" class="btn btn-primary me-2" onclick="window.location.href='/logOut'"> Logout </button>
+    <button class="btn btn-primary me-2" onclick="window.location.href='/logOut'"> Logout </button>
 
 <%- include("templates/footer") %> 
